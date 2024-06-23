@@ -1,0 +1,36 @@
+{
+	"compilerOptions": {
+		// Set the ECMAScript version to ES2020
+		"target": "ES2020",
+
+		// Use a custom module system called NodeNext
+		"module": "NodeNext",
+
+		// Use the nodenext module resolution strategy
+		"moduleResolution": "nodenext",
+
+		// Enable compatibility with modules that use `export =` syntax
+		"esModuleInterop": true,
+
+		// Allow importing JSON files as modules
+		"resolveJsonModule": true,
+
+		// Generate source maps for the compiled code
+		"sourceMap": true,
+
+		// Specify the directory where the compiled code will be outputted
+		"outDir": "./dist",
+
+		// Enable strict type checking rules
+		"strict": true
+	},
+
+	// Specify the files that should be included and excluded in the compilation process
+	"include": ["src/**/*.ts"],
+	"ts-node": {
+		"esm": true,
+		"compiler": "typescript"
+	},
+
+	"exclude": ["node_modules", "dist"]
+}
