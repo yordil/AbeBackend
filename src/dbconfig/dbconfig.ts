@@ -3,45 +3,22 @@ const { Pool } = pkg;
 import dotenv from "dotenv";
 dotenv.config();
 
-interface DBConfig {
-	DB_HOST: string;
-	DB: string;
-	DB_USER: string;
-	DB_PASS: string;
-	DB_PORT: string;
-}
-
-// Create a function to parse and validate environment variables
-function getDBConfig(): DBConfig {
-	const config: DBConfig = {
-		DB_USER: process.env.DB_USER || "",
-		DB_HOST: process.env.DB_HOST || "",
-		DB: process.env.DB || "",
-		DB_PASS: process.env.DB_PASS || "",
-		DB_PORT: process.env.DB_PORT || "",
-	};
-
-	
-	if (
-		!config.DB_USER ||
-		!config.DB_HOST ||
-		!config.DB ||
-		!config.DB_PASS ||
-		!config.DB_PORT
-	) {
-		throw new Error("Missing required database environment variables");
-	}
-	return config;
-}
-
-const dbConfig = getDBConfig();
-
 const pool = new Pool({
-	user: dbConfig.DB_USER,
-	host: dbConfig.DB_HOST,
-	database: dbConfig.DB,
-	password: dbConfig.DB_PASS,
-	port: parseInt(dbConfig.DB_PORT),
+	user: process.env.DB_USER,
+	host: process.env.DB_HOST,
+	database: process.env.DB,
+	password: process.env.DB_PASS,
+	port: 5432,
+	ssl: {
+		rejectUnauthorized: true,
+		
+	},
+	max: 10,
+});
+
+pool.on("error", (err, client) => {
+	console.error("Unexpected error on idle client", err);
+	process.exit(-1); // Consider handling this more gracefully in production
 });
 
 export default pool;
