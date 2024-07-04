@@ -5,7 +5,7 @@ interface orderService {
 	getAllOrders: () => Promise<Promise<Order>[] | errorOrSuccess>;
 	getOrderById: (id: number) => Promise<Order | errorOrSuccess>;
 	addOrder: (order: Order) => Promise<errorOrSuccess>;
-	// updateOrder: (order: Order) => Promise<errorOrSuccess>;
+	updateOrder: (order: Order) => Promise<errorOrSuccess>;
 }
 const orderQuery = `SELECT 
                     o.order_id,
@@ -103,41 +103,52 @@ const addOrder = async (order: Order): Promise<errorOrSuccess> => {
 	}
 };
 
-// const updateOrder = async (order: Order): Promise<errorOrSuccess> => {
-// 	try {
-// 		const updateOrderQuery = `
-//       UPDATE orders
-//       SET order_status= $1
-//       WHERE order_id = $2;
-//     `;
-// 		await pool.query(updateOrderQuery, [
-// 			order.order_description,
-// 			order.order_id,
-// 		]);
+const updateOrder = async (order: Order): Promise<errorOrSuccess> => {
+	try {
+		const query1 = `UPDATE order_info
+						SET
+    					estimated_completion_date = $1,
+    					completion_date = NULL
+						WHERE
+    					order_id = $2`;
+		const value1 = [order.estimated_completion_date, order.order_id];
 
-// 		const updateOrderInfoQuery = `
-//       UPDATE order_info
-//       SET estimated_completion_date = $1, completion_date = $2
-//       WHERE order_id = $3;
-//     `;
-// 		await pool.query(updateOrderInfoQuery, [
-// 			order.estimated_completion_date,
-// 			order.completion_date,
-// 			order.order_id,
-// 		]);
+		const query2 = `UPDATE order_status SET order_status = $1 WHERE order_id = $2 `;
+		const value2 = [order.order_completed, order.order_id];
 
-// 		return {
-// 			message: "Order updated successfully",
-// 			status: 200,
-// 		};
-// 	} catch (error) {
-// 		console.log(error);
-// 		return {
-// 			message: "An error occurred while updating order",
-// 			status: 500,
-// 		};
-// 	}
-// };
+		const res1 = await pool.query(query1, value1);
+		console.log("query1")
+		const res2 = await pool.query(query2, value2);
+		console.log("query2")
+		
+		const query3 = `DELETE FROM order_services WHERE order_id = $1`;
+		const value3 = [order.order_id];
+		const res3 = await pool.query(query3, value3);
+		console.log("query3")
+		
+		const orderServices = order.order_services.map((service) => {
+			return `(${order.order_id}, ${service.service_id} , 0)`;
+		});
+		
+		const queryForService = `INSERT INTO order_services(order_id, service_id , service_completed) VALUES ${orderServices.join(
+			", "
+			)}`;
+			
+			const q4 = await pool.query(queryForService);
+			console.log("query4")
+
+		return {
+			message: "Order updated successfully",
+			status: 200,
+		};
+	} catch (error) {
+		console.log(error);
+		return {
+			message: "An error occurred while updating order",
+			status: 500,
+		};
+	}
+};
 
 const getAllOrders = async (): Promise<Promise<Order>[] | errorOrSuccess> => {
 	const query = `SELECT 
@@ -217,7 +228,7 @@ const orderService: orderService = {
 	getAllOrders,
 	getOrderById,
 	addOrder,
-	// updateOrder,
+	updateOrder,
 };
 
 export default orderService;

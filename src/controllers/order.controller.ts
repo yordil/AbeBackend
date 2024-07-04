@@ -18,9 +18,9 @@ const addOrder = async (req: Request , res: Response) => {
     return res.json(result);
 }
 
-// const updateOrder = async (req: Request , res: Response) => {
-//     const result = await orderService.updateOrder(req.body);
-//     return res.json(result);
-// }
+const updateOrder = async (req: Request , res: Response) => {
+    const result = await orderService.updateOrder(req.body);
+    return res.json(result);
+}
 
-export default { getAllOrders , getOrderById , addOrder }
+export default { getAllOrders , getOrderById , addOrder  , updateOrder}

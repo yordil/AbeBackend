@@ -95,12 +95,12 @@ CREATE TABLE IF NOT EXISTS order_services (
   order_service_id SERIAL PRIMARY KEY,
   order_id INT NOT NULL REFERENCES orders(order_id) ON DELETE CASCADE,
   service_id INT NOT NULL REFERENCES common_services(service_id),
-  service_completed INT NOT NULL
+  service_completed NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS order_status (
   order_status_id SERIAL PRIMARY KEY,
-  order_id INT NOT NULL REFERENCES orders(order_id) ON DELETE CASCADE,
+  order_id NOT NULL REFERENCES orders(order_id) ON DELETE CASCADE,
   order_status INT NOT NULL
 );
 
